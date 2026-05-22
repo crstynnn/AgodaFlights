@@ -2,12 +2,15 @@ package com.example.agodaapp.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.agodaapp.adapters.FlightAdapter
 import com.example.agodaapp.databinding.ActivityFlightListBinding
 import com.example.agodaapp.models.Flight
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
 
 class FlightListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityFlightListBinding
@@ -17,6 +20,8 @@ class FlightListActivity : AppCompatActivity() {
     private var to = ""
     private var date = ""
     private var passengers = 1
+    private var fromCode = ""
+    private var toCode = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +34,8 @@ class FlightListActivity : AppCompatActivity() {
         to = intent.getStringExtra("to") ?: ""
         date = intent.getStringExtra("date") ?: ""
         passengers = intent.getIntExtra("passengers", 1)
+        fromCode = intent.getStringExtra("from_code") ?: from.substring(0, 3)
+        toCode = intent.getStringExtra("to_code") ?: to.substring(0, 3)
 
         binding.toolbar.setNavigationOnClickListener {
             finish()
@@ -37,28 +44,31 @@ class FlightListActivity : AppCompatActivity() {
         binding.tvSearchInfo.text = "$from → $to | $date | $passengers passenger(s)"
 
         setupRecyclerView()
-        loadFlights()
+        loadFlightsFromFirestore()
     }
 
     private fun setupRecyclerView() {
         flightAdapter = FlightAdapter(mutableListOf()) { flight ->
-            val intent = Intent(this, BookingDetailsActivity::class.java)
-            intent.putExtra("flight_id", flight.id)
-            intent.putExtra("flight_airline", flight.airline)
-            intent.putExtra("flight_number", flight.flightNumber)
-            intent.putExtra("flight_price", flight.price)
-            intent.putExtra("flight_departure", flight.departureTime)
-            intent.putExtra("flight_arrival", flight.arrivalTime)
-            intent.putExtra("flight_duration", flight.duration)
-            intent.putExtra("flight_from", flight.from)
-            intent.putExtra("flight_to", flight.to)
-            intent.putExtra("flight_date", flight.date)
-            intent.putExtra("flight_gate", flight.gate)
-            intent.putExtra("flight_terminal", flight.terminal)
-            intent.putExtra("flight_baggage", flight.baggageAllowance)
-            intent.putExtra("passenger_count", passengers)
-            intent.putExtra("from_airport", from)
-            intent.putExtra("to_airport", to)
+            val intent = Intent(this, BookingDetailsActivity::class.java).apply {
+                putExtra("flight_id", flight.id)
+                putExtra("flight_airline", flight.airline)
+                putExtra("flight_number", flight.flightNumber)
+                putExtra("flight_price", flight.price)
+                putExtra("flight_departure", flight.departureTime)
+                putExtra("flight_arrival", flight.arrivalTime)
+                putExtra("flight_duration", flight.duration)
+                putExtra("flight_from", flight.from)
+                putExtra("flight_to", flight.to)
+                putExtra("flight_date", flight.date)
+                putExtra("flight_gate", flight.gate)
+                putExtra("flight_terminal", flight.terminal)
+                putExtra("flight_baggage", flight.baggageAllowance)
+                putExtra("passenger_count", passengers)
+                putExtra("from_airport", from)
+                putExtra("to_airport", to)
+                putExtra("from_code", fromCode)
+                putExtra("to_code", toCode)
+            }
             startActivity(intent)
         }
 
@@ -66,94 +76,30 @@ class FlightListActivity : AppCompatActivity() {
         binding.rvFlights.adapter = flightAdapter
     }
 
-    private fun loadFlights() {
-        val sampleFlights = listOf(
-            Flight(
-                id = "1",
-                airline = "Philippine Airlines",
-                flightNumber = "PR 123",
-                from = from,
-                to = to,
-                departureTime = "06:00 AM",
-                arrivalTime = "07:30 AM",
-                duration = "1h 30m",
-                price = 2500.00,
-                availableSeats = 50,
-                date = date,
-                gate = "A12",
-                terminal = "T1",
-                baggageAllowance = "20kg"
-            ),
-            Flight(
-                id = "2",
-                airline = "Cebu Pacific",
-                flightNumber = "5J 456",
-                from = from,
-                to = to,
-                departureTime = "10:00 AM",
-                arrivalTime = "11:35 AM",
-                duration = "1h 35m",
-                price = 1899.00,
-                availableSeats = 30,
-                date = date,
-                gate = "B05",
-                terminal = "T2",
-                baggageAllowance = "15kg"
-            ),
-            Flight(
-                id = "3",
-                airline = "AirAsia Philippines",
-                flightNumber = "Z2 789",
-                from = from,
-                to = to,
-                departureTime = "02:00 PM",
-                arrivalTime = "03:25 PM",
-                duration = "1h 25m",
-                price = 2100.00,
-                availableSeats = 45,
-                date = date,
-                gate = "C08",
-                terminal = "T3",
-                baggageAllowance = "20kg"
-            ),
-            Flight(
-                id = "4",
-                airline = "Philippine Airlines",
-                flightNumber = "PR 321",
-                from = from,
-                to = to,
-                departureTime = "05:00 PM",
-                arrivalTime = "06:30 PM",
-                duration = "1h 30m",
-                price = 3200.00,
-                availableSeats = 20,
-                date = date,
-                gate = "D15",
-                terminal = "T1",
-                baggageAllowance = "25kg"
-            ),
-            Flight(
-                id = "5",
-                airline = "Cebu Pacific",
-                flightNumber = "5J 654",
-                from = from,
-                to = to,
-                departureTime = "08:00 PM",
-                arrivalTime = "09:35 PM",
-                duration = "1h 35m",
-                price = 1899.00,
-                availableSeats = 35,
-                date = date,
-                gate = "E22",
-                terminal = "T2",
-                baggageAllowance = "15kg"
-            )
-        )
+    private fun loadFlightsFromFirestore() {
+        // Query flights from Firestore based on origin and destination
+        firestore.collection("flights")
+            .whereEqualTo("fromCode", fromCode)
+            .whereEqualTo("toCode", toCode)
+            .get()
+            .addOnSuccessListener { result ->
+                val flights = mutableListOf<Flight>()
+                for (document in result) {
+                    val flight = document.toObject<Flight>()
+                    flights.add(flight)
+                }
 
-        flightAdapter.updateFlights(sampleFlights)
+                if (flights.isEmpty()) {
+                    Toast.makeText(this, "No flights found for this route", Toast.LENGTH_SHORT).show()
+                    binding.tvFlightCount.text = "0 flights found"
+                } else {
+                    binding.tvFlightCount.text = "${flights.size} flights found"
+                    flightAdapter.updateFlights(flights)
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error loading flights: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("FlightList", "Error: ${e.message}")
+            }
     }
-}
-
-class BookingDetailsActivity {
-
 }

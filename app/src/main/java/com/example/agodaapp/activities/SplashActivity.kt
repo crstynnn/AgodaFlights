@@ -9,15 +9,12 @@ import com.example.agodaapp.R
 import com.google.firebase.auth.FirebaseAuth
 
 class SplashActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        auth = FirebaseAuth.getInstance()
-
         Handler(Looper.getMainLooper()).postDelayed({
+            val auth = FirebaseAuth.getInstance()
             if (auth.currentUser != null) {
                 startActivity(Intent(this, MainActivity::class.java))
             } else {

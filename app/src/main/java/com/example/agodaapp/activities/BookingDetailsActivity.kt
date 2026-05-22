@@ -12,7 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
-class bookingDetailsActivity : AppCompatActivity() {
+class BookingDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityBookingDetailsBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
@@ -61,33 +61,53 @@ class bookingDetailsActivity : AppCompatActivity() {
         fromAirport = intent.getStringExtra("from_airport") ?: ""
         toAirport = intent.getStringExtra("to_airport") ?: ""
 
+        // Setup toolbar
         binding.toolbar.setNavigationOnClickListener {
             finish()
         }
 
+        // Display flight details
         displayFlightDetails()
+
+        // Load user data
         loadUserData()
 
+        // Confirm button click
         binding.btnConfirmBooking.setOnClickListener {
             confirmBooking()
         }
     }
 
     private fun displayFlightDetails() {
+        // Airline info
         binding.tvAirline.text = "$flightAirline - $flightNumber"
         binding.tvFlightNumber.text = flightNumber
+
+        // Flight times
         binding.tvDepartureTime.text = flightDeparture
         binding.tvArrivalTime.text = flightArrival
+        binding.tvDuration.text = flightDuration
+
+        // Route
         binding.tvFrom.text = flightFrom
         binding.tvTo.text = flightTo
-        binding.tvDuration.text = flightDuration
-        binding.tvFlightDate.text = "Date: $flightDate"
-        binding.tvGate.text = "Gate: $flightGate | Terminal: $flightTerminal"
-        binding.tvBaggage.text = "Baggage: $flightBaggage"
 
+        // Date
+        binding.tvFlightDate.text = "Date: $flightDate"
+
+        // Gate and baggage info (using the correct TextView IDs from your layout)
+        try {
+            binding.tvGateInfo.text = "Gate: $flightGate | Terminal: $flightTerminal"
+            binding.tvBaggageInfo.text = "Baggage: $flightBaggage"
+        } catch (e: Exception) {
+            // If these TextViews don't exist, just skip them
+        }
+
+        // Price calculation
         val taxes = 250.0
         val totalPrice = (flightPrice * passengerCount) + taxes
 
+        // Update price summary
         binding.tvBaseFare.text = String.format("₱%.2f", flightPrice)
         binding.tvPassengerCount.text = passengerCount.toString()
         binding.tvTaxes.text = String.format("₱%.2f", taxes)
@@ -121,6 +141,7 @@ class bookingDetailsActivity : AppCompatActivity() {
         val bookingDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
         val bookingRef = generateBookingReference()
 
+        // Create Flight object
         val flight = Flight(
             id = flightId,
             airline = flightAirline,
@@ -135,7 +156,9 @@ class bookingDetailsActivity : AppCompatActivity() {
             date = flightDate,
             gate = flightGate,
             terminal = flightTerminal,
-            baggageAllowance = flightBaggage
+            baggageAllowance = flightBaggage,
+            fromCode = "",
+            toCode = ""
         )
 
         val booking = Booking(
@@ -150,7 +173,11 @@ class bookingDetailsActivity : AppCompatActivity() {
             totalPrice = totalPrice,
             bookingDate = bookingDate,
             status = "Confirmed",
-            bookingReference = bookingRef
+            paymentMethod = "Credit Card",
+            transactionId = "",
+            bookingReference = bookingRef,
+            isDownloaded = false,
+            isShared = false
         )
 
         binding.btnConfirmBooking.isEnabled = false
@@ -159,6 +186,7 @@ class bookingDetailsActivity : AppCompatActivity() {
         firestore.collection("bookings").document(booking.id)
             .set(booking)
             .addOnSuccessListener {
+                // Navigate to Payment or Confirmation
                 val intent = Intent(this, BookingConfirmationActivity::class.java).apply {
                     putExtra("booking_id", booking.id)
                     putExtra("booking_ref", bookingRef)
@@ -184,10 +212,6 @@ class bookingDetailsActivity : AppCompatActivity() {
                 binding.btnConfirmBooking.text = "Confirm Booking"
                 Toast.makeText(this, "Booking failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-    }
-
-    class BookingConfirmationActivity {
-
     }
 
     private fun generateBookingReference(): String {

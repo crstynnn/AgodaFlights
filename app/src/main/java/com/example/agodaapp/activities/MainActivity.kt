@@ -26,12 +26,7 @@ class MainActivity : AppCompatActivity() {
         "CEB - Mactan-Cebu Int'l Airport, Cebu",
         "DVO - Francisco Bangoy Int'l Airport, Davao",
         "CRK - Clark Int'l Airport, Pampanga",
-        "ILO - Iloilo Int'l Airport, Iloilo",
-        "BAG - Baguio Airport, Baguio",
-        "BCD - Bacolod-Silay Airport, Bacolod",
-        "PPS - Puerto Princesa Airport, Palawan",
-        "TAG - Bohol-Panglao Airport, Bohol",
-        "LAO - Laoag Int'l Airport, Ilocos Norte"
+        "ILO - Iloilo Int'l Airport, Iloilo"
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,22 +37,26 @@ class MainActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
 
+        // Redirect to login if not authenticated
+        if (auth.currentUser == null) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
         setupAirportSpinners()
         setupDatePicker()
         loadUserData()
+        setupRecentBookings()
         loadRecentBookings()
 
         binding.btnSearchFlights.setOnClickListener {
             searchFlights()
         }
 
-        // Bottom Navigation Setup - FIXED
-        binding.bottomNavigation.setOnItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.navigation_home -> {
-                    // Already on home, do nothing
-                    true
-                }
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> true
                 R.id.navigation_bookings -> {
                     startActivity(Intent(this, MyBookingsActivity::class.java))
                     true
@@ -75,28 +74,31 @@ class MainActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, philippineAirports)
         binding.actFrom.setAdapter(adapter)
         binding.actTo.setAdapter(adapter)
-
-        // Optional: Set default values
         binding.actFrom.setText(philippineAirports[0], false)
         binding.actTo.setText(philippineAirports[1], false)
     }
 
     private fun setupDatePicker() {
-        binding.etDate.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            val datePicker = DatePickerDialog(
-                this,
-                { _, year, month, day ->
-                    val date = String.format("%d-%02d-%02d", year, month + 1, day)
-                    binding.etDate.setText(date)
-                },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-            )
-            datePicker.datePicker.minDate = System.currentTimeMillis() - 1000
-            datePicker.show()
-        }
+        binding.etDate.isFocusable = false
+        binding.etDate.setOnClickListener { showDatePicker() }
+        binding.etDate.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) showDatePicker() }
+    }
+
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        DatePickerDialog(
+            this,
+            { _, year, month, day ->
+                val formatted = String.format("%d-%02d-%02d", year, month + 1, day)
+                binding.etDate.setText(formatted)
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).also { dialog ->
+            // Prevent selecting past dates
+            dialog.datePicker.minDate = calendar.timeInMillis
+        }.show()
     }
 
     private fun loadUserData() {
@@ -107,22 +109,28 @@ class MainActivity : AppCompatActivity() {
                 val name = document.getString("name") ?: "User"
                 binding.tvUserName.text = name.split(" ")[0]
             }
-            .addOnFailureListener {
-                binding.tvUserName.text = "User"
+    }
+
+    private fun setupRecentBookings() {
+        bookingAdapter = BookingAdapter(mutableListOf()) { booking ->
+            // Navigate to booking confirmation details on click
+            val intent = Intent(this, BookingConfirmationActivity::class.java).apply {
+                putExtra("booking_ref", booking.bookingReference)
+                putExtra("total_amount", booking.totalPrice)
+                putExtra("payment_method", booking.paymentMethod)
+                putExtra("flight_airline", booking.flight?.airline ?: "")
+                putExtra("flight_number", booking.flight?.flightNumber ?: "")
+                putExtra("flight_from", booking.flight?.from ?: "")
+                putExtra("flight_to", booking.flight?.to ?: "")
             }
+            startActivity(intent)
+        }
+        binding.rvRecentBookings.layoutManager = LinearLayoutManager(this)
+        binding.rvRecentBookings.adapter = bookingAdapter
     }
 
     private fun loadRecentBookings() {
         val userId = auth.currentUser?.uid ?: return
-
-        bookingAdapter = BookingAdapter(mutableListOf()) { booking ->
-            // Optional: Handle booking click
-            Toast.makeText(this, "Booking: ${booking.id}", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.rvRecentBookings.layoutManager = LinearLayoutManager(this)
-        binding.rvRecentBookings.adapter = bookingAdapter
-
         firestore.collection("bookings")
             .whereEqualTo("userId", userId)
             .orderBy("bookingDate", com.google.firebase.firestore.Query.Direction.DESCENDING)
@@ -131,25 +139,19 @@ class MainActivity : AppCompatActivity() {
             .addOnSuccessListener { result ->
                 val bookings = result.toObjects(Booking::class.java)
                 bookingAdapter.updateBookings(bookings)
-                if (bookings.isEmpty()) {
-                    binding.tvNoBookings.visibility = android.view.View.VISIBLE
-                } else {
-                    binding.tvNoBookings.visibility = android.view.View.GONE
-                }
             }
             .addOnFailureListener {
-                binding.tvNoBookings.visibility = android.view.View.VISIBLE
-                binding.tvNoBookings.text = "Error loading bookings"
+                // Silently fail — recent bookings are non-critical
             }
     }
 
     private fun searchFlights() {
-        val from = binding.actFrom.text.toString()
-        val to = binding.actTo.text.toString()
-        val date = binding.etDate.text.toString()
-        val passengers = binding.etPassengers.text.toString()
+        val from = binding.actFrom.text.toString().trim()
+        val to = binding.actTo.text.toString().trim()
+        val date = binding.etDate.text.toString().trim()
+        val passengersStr = binding.etPassengers.text.toString().trim()
 
-        if (from.isEmpty() || to.isEmpty() || date.isEmpty() || passengers.isEmpty()) {
+        if (from.isEmpty() || to.isEmpty() || date.isEmpty() || passengersStr.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
             return
         }
@@ -159,22 +161,18 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val passengersInt = passengers.toIntOrNull()
-        if (passengersInt == null || passengersInt < 1) {
-            Toast.makeText(this, "Please enter valid number of passengers", Toast.LENGTH_SHORT).show()
+        val passengers = passengersStr.toIntOrNull()
+        if (passengers == null || passengers < 1) {
+            Toast.makeText(this, "Please enter a valid number of passengers", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val intent = Intent(this, FlightListActivity::class.java)
-        intent.putExtra("from", from)
-        intent.putExtra("to", to)
-        intent.putExtra("date", date)
-        intent.putExtra("passengers", passengersInt)
+        val intent = Intent(this, FlightListActivity::class.java).apply {
+            putExtra("from", from)
+            putExtra("to", to)
+            putExtra("date", date)
+            putExtra("passengers", passengers)
+        }
         startActivity(intent)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        loadRecentBookings() // Refresh bookings when returning to this screen
     }
 }

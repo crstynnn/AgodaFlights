@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
+    app:cardElevation="2dp"
     android:layout_margin="8dp">
 
     <LinearLayout
@@ -13,11 +13,12 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Airline and Price Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="3">
+            android:gravity="center_vertical">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -29,58 +30,140 @@
                     android:id="@+id/tvAirline"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="Philippine Airlines"
                     android:textSize="16sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvFlightNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="PR 123"
                     android:textSize="12sp"
-                    android:textColor="@android:color/darker_gray"/>
+                    android:textColor="#757575" />
+
             </LinearLayout>
 
             <TextView
                 android:id="@+id/tvPrice"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:text="₱2,500"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#6200EE"
-                android:gravity="end"/>
+                android:textColor="#6200EE" />
+
         </LinearLayout>
 
+        <!-- Flight Times Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="12dp">
+            android:gravity="center"
+            android:layout_marginTop="12dp"
+            android:weightSum="3">
 
             <TextView
                 android:id="@+id/tvDepartureTime"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:text="06:00 AM"
                 android:textSize="14sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvDuration"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:text="1h 30m"
                 android:textSize="12sp"
-                android:gravity="center"/>
+                android:textColor="#757575"
+                android:gravity="center" />
 
             <TextView
                 android:id="@+id/tvArrivalTime"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:text="07:30 AM"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:gravity="end"/>
+                android:gravity="end" />
+
         </LinearLayout>
+
+        <!-- Route Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:weightSum="3">
+
+            <TextView
+                android:id="@+id/tvFrom"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="MNL"
+                android:textSize="12sp"
+                android:textColor="#757575" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="→"
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvTo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="CEB"
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:gravity="end" />
+
+        </LinearLayout>
+
+        <!-- Date -->
+        <TextView
+            android:id="@+id/tvFlightDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dec 25, 2024"
+            android:textSize="12sp"
+            android:textColor="#757575"
+            android:layout_marginTop="8dp" />
+
+        <!-- Seat Availability -->
+        <TextView
+            android:id="@+id/tvAvailableSeats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="50 seats available"
+            android:textSize="11sp"
+            android:textColor="#4CAF50"
+            android:layout_marginTop="8dp" />
+
+        <!-- Select Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSelect"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:text="Select"
+            android:textAllCaps="false"
+            android:backgroundTint="#6200EE"
+            app:cornerRadius="20dp" />
+
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

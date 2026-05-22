@@ -6,6 +6,8 @@ data class Flight(
     val flightNumber: String = "",
     val from: String = "",
     val to: String = "",
+    val fromCode: String = "",
+    val toCode: String = "",
     val departureTime: String = "",
     val arrivalTime: String = "",
     val duration: String = "",
@@ -14,5 +16,6 @@ data class Flight(
     val date: String = "",
     val gate: String = "",
     val terminal: String = "",
-    val baggageAllowance: String = ""
+    val baggageAllowance: String = "",
+    val status: String = "On Time"
 )

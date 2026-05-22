@@ -3,58 +3,65 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="vertical"
-        android:padding="24dp"
-        android:gravity="center">
+        android:padding="24dp">
 
+        <!-- App Logo -->
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/ic_plane"
             android:layout_marginTop="40dp"
             android:layout_marginBottom="20dp"
-            app:tint="#6200EE" />
+            android:src="@drawable/ic_plane"
+            app:tint="#4706A5" />
 
+        <!-- Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="Welcome Back!"
+            android:textColor="#212121"
             android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:textStyle="bold" />
 
+        <!-- Subtitle -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
             android:text="Sign in to continue booking flights"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
-            android:layout_marginBottom="40dp"/>
+            android:textColor="#757575"
+            android:textSize="14sp" />
 
+        <!-- Email Field -->
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            android:layout_marginBottom="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Email"
-                android:inputType="textEmailAddress"/>
+                android:inputType="textEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Password Field -->
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -62,49 +69,58 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Password"
-                android:inputType="textPassword"/>
+                android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Forgot Password -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Forgot Password?"
-            android:textSize="12sp"
-            android:textColor="#6200EE"
+            android:layout_gravity="end"
             android:layout_marginBottom="24dp"
-            android:layout_gravity="end"/>
+            android:text="Forgot Password?"
+            android:textColor="#6200EE"
+            android:textSize="12sp" />
 
+        <!-- Login Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:backgroundTint="#BA99EA"
             android:text="Login"
-            android:textAllCaps="false"/>
+            android:textAllCaps="false" />
 
+        <!-- OR Divider -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="OR"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            android:text="OR"
+            android:textColor="#757575"
+            android:textSize="12sp" />
 
+        <!-- Register Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRegister"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="Create New Account"
             android:textAllCaps="false"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+            app:strokeColor="#6200EE"
+            app:strokeWidth="1.5dp" />
 
+        <!-- Error Message -->
         <TextView
             android:id="@+id/tvError"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/holo_red_dark"
             android:layout_marginTop="16dp"
-            android:visibility="gone"
-            android:text=""/>
+            android:textColor="#D32F2F"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
     </LinearLayout>
 </ScrollView>

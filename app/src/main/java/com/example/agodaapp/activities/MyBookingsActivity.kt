@@ -1,5 +1,6 @@
 package com.example.agodaapp.activities
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,9 +24,7 @@ class MyBookingsActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
 
-        binding.toolbar.setNavigationOnClickListener {
-            finish()
-        }
+        binding.toolbar.setNavigationOnClickListener { finish() }
 
         setupRecyclerView()
         loadBookings()
@@ -33,9 +32,18 @@ class MyBookingsActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         bookingAdapter = BookingAdapter(mutableListOf()) { booking ->
-            // View booking details
+            // Open booking confirmation details when tapped
+            val intent = Intent(this, BookingConfirmationActivity::class.java).apply {
+                putExtra("booking_ref", booking.bookingReference)
+                putExtra("total_amount", booking.totalPrice)
+                putExtra("payment_method", booking.paymentMethod.ifEmpty { "N/A" })
+                putExtra("flight_airline", booking.flight?.airline ?: "")
+                putExtra("flight_number", booking.flight?.flightNumber ?: "")
+                putExtra("flight_from", booking.flight?.from ?: "")
+                putExtra("flight_to", booking.flight?.to ?: "")
+            }
+            startActivity(intent)
         }
-
         binding.rvBookings.layoutManager = LinearLayoutManager(this)
         binding.rvBookings.adapter = bookingAdapter
     }
@@ -50,6 +58,9 @@ class MyBookingsActivity : AppCompatActivity() {
             .addOnSuccessListener { result ->
                 val bookings = result.toObjects(Booking::class.java)
                 bookingAdapter.updateBookings(bookings)
+            }
+            .addOnFailureListener {
+                // Silently fail — user will see empty list
             }
     }
 }

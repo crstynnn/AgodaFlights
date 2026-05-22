@@ -18,22 +18,37 @@ class LoginActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
+        // If already logged in, skip to main
+        if (auth.currentUser != null) {
+            navigateToMain()
+            return
+        }
+
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
 
             if (email.isEmpty() || password.isEmpty()) {
-                showError("Please fill all fields")
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
+            binding.btnLogin.isEnabled = false
+            binding.btnLogin.text = "Logging in..."
+
             auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
+                .addOnCompleteListener(this) { task ->
+                    binding.btnLogin.isEnabled = true
+                    binding.btnLogin.text = "Login"
                     if (task.isSuccessful) {
-                        startActivity(Intent(this, MainActivity::class.java))
-                        finish()
+                        Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+                        navigateToMain()
                     } else {
-                        showError("Login failed: ${task.exception?.message}")
+                        Toast.makeText(
+                            this,
+                            "Login failed: ${task.exception?.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
         }
@@ -43,8 +58,8 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun showError(message: String) {
-        binding.tvError.text = message
-        binding.tvError.visibility = android.view.View.VISIBLE
+    private fun navigateToMain() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 }
