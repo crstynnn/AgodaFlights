@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/bg_sheet_top_corners">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filter &amp; Sort"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sort By"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <RadioGroup
+        android:id="@+id/rgSort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rbPriceLow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Price: Low to High"/>
+
+        <RadioButton
+            android:id="@+id/rbPriceHigh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Price: High to Low"/>
+
+        <RadioButton
+            android:id="@+id/rbDuration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fastest First"/>
+
+    </RadioGroup>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_300"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filter by Airline"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:id="@+id/llAirlines"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnApply"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Apply"
+        android:layout_marginTop="24dp"
+        app:cornerRadius="12dp"/>
+
+</LinearLayout>
