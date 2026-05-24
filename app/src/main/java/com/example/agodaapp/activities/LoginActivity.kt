@@ -6,10 +6,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.agodaapp.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,10 +19,11 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
-        // If already logged in, skip to main
+        // If already logged in, check role and skip to appropriate activity
         if (auth.currentUser != null) {
-            navigateToMain()
+            checkUserRoleAndNavigate()
             return
         }
 
@@ -28,8 +31,12 @@ class LoginActivity : AppCompatActivity() {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
 
+            binding.tilEmail.error = null
+            binding.tilPassword.error = null
+
             if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                if (email.isEmpty()) binding.tilEmail.error = "Email is required"
+                if (password.isEmpty()) binding.tilPassword.error = "Password is required"
                 return@setOnClickListener
             }
 
@@ -38,17 +45,12 @@ class LoginActivity : AppCompatActivity() {
 
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
-                    binding.btnLogin.isEnabled = true
-                    binding.btnLogin.text = "Login"
                     if (task.isSuccessful) {
-                        Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
-                        navigateToMain()
+                        checkUserRoleAndNavigate()
                     } else {
-                        Toast.makeText(
-                            this,
-                            "Login failed: ${task.exception?.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        binding.btnLogin.isEnabled = true
+                        binding.btnLogin.text = "Login"
+                        binding.tilPassword.error = "Invalid email or password"
                     }
                 }
         }
@@ -56,10 +58,40 @@ class LoginActivity : AppCompatActivity() {
         binding.btnRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
+
+        binding.tvForgotPassword.setOnClickListener {
+            startActivity(Intent(this, ForgotPasswordActivity::class.java))
+        }
     }
 
-    private fun navigateToMain() {
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
+    private fun checkUserRoleAndNavigate() {
+        val userId = auth.currentUser?.uid ?: return
+        
+        binding.btnLogin.isEnabled = false
+        binding.btnLogin.text = "Checking role..."
+        
+        firestore.collection("users").document(userId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val userType = document.getString("userType") ?: "customer"
+                    if (userType == "admin") {
+                        startActivity(Intent(this, AdminDashboardActivity::class.java))
+                    } else {
+                        startActivity(Intent(this, MainActivity::class.java))
+                    }
+                    finish()
+                } else {
+                    // Fallback if user doc doesn't exist yet
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                }
+            }
+            .addOnFailureListener {
+                binding.btnLogin.isEnabled = true
+                binding.btnLogin.text = "Login"
+                // On failure, default to MainActivity
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
     }
 }

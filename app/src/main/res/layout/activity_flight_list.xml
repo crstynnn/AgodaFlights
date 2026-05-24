@@ -9,10 +9,12 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#6200EE"
+        android:background="@color/white"
         app:title="Available Flights"
-        app:titleTextColor="@android:color/white"
-        app:navigationIcon="@drawable/ic_back"/>
+        app:titleTextColor="@color/agoda_blue"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="@color/agoda_blue"
+        app:menu="@menu/menu_flight_list"/>
 
     <!-- Search Info Card -->
     <com.google.android.material.card.MaterialCardView
@@ -34,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:text="MNL → CEB | 2024-01-15 | 2 passengers"
                 android:textSize="14sp"
-                android:textColor="@android:color/black"/>
+                android:textColor="?attr/colorOnSurface"/>
 
             <TextView
                 android:id="@+id/tvFlightCount"
@@ -42,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:text="5 flights found"
                 android:textSize="12sp"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/gray_600"
                 android:layout_marginTop="4dp"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

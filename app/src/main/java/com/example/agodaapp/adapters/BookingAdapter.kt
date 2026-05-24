@@ -11,9 +11,25 @@ class BookingAdapter(
     private val onItemClick: (Booking) -> Unit
 ) : RecyclerView.Adapter<BookingAdapter.BookingViewHolder>() {
 
+    private var allBookings = ArrayList(bookings)
+
     fun updateBookings(newBookings: List<Booking>) {
-        bookings.clear()
-        bookings.addAll(newBookings)
+        allBookings.clear()
+        allBookings.addAll(newBookings)
+        bookings = ArrayList(allBookings)
+        notifyDataSetChanged()
+    }
+
+    fun filter(query: String) {
+        bookings = if (query.isEmpty()) {
+            ArrayList(allBookings)
+        } else {
+            allBookings.filter { 
+                it.passengerName.contains(query, true) || 
+                it.flight?.flightNumber?.contains(query, true) == true ||
+                it.flight?.airline?.contains(query, true) == true
+            }.toMutableList()
+        }
         notifyDataSetChanged()
     }
 
@@ -39,11 +55,46 @@ class BookingAdapter(
 
             binding.tvFlightInfo.text = "$airline - $flightNum"
             binding.tvRoute.text = "$fromCode → $toCode"
-            binding.tvDate.text = booking.flight?.date ?: ""
+            binding.tvDate.text = booking.flight?.getFormattedDate() ?: ""
             binding.tvPassenger.text = "Passenger: ${booking.passengerName}"
             binding.tvSeats.text = "Seats: ${booking.seats}"
             binding.tvPrice.text = String.format("₱%,.2f", booking.totalPrice)
-            binding.tvStatus.text = booking.status
+            
+            val bookingStatus = booking.status ?: "Confirmed"
+            val flightStatus = booking.flight?.status ?: "On Time"
+            
+            android.util.Log.d("BookingAdapter", "DEBUG: booking.id=${booking.id}, bookingStatus=$bookingStatus, flightStatus=$flightStatus, flightObj=${booking.flight}")
+            
+            binding.tvBookingStatus.text = bookingStatus
+            binding.tvFlightStatus.text = flightStatus
+            
+            // Apply styles for booking status
+            when {
+                bookingStatus.equals("Cancelled", true) -> {
+                    binding.tvBookingStatus.setTextColor(binding.root.context.getColor(com.example.agodaapp.R.color.agoda_red))
+                    binding.tvBookingStatus.background = android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#FFEBEE"))
+                }
+                else -> {
+                    binding.tvBookingStatus.setTextColor(binding.root.context.getColor(com.example.agodaapp.R.color.agoda_green))
+                    binding.tvBookingStatus.background = android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#E8F5E9"))
+                }
+            }
+
+            // Apply styles for flight status
+            when {
+                flightStatus.equals("Delayed", true) -> {
+                    binding.tvFlightStatus.setTextColor(android.graphics.Color.parseColor("#FF8F00")) // Amber
+                    binding.tvFlightStatus.background = android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#FFF8E1"))
+                }
+                flightStatus.equals("Cancelled", true) -> {
+                    binding.tvFlightStatus.setTextColor(binding.root.context.getColor(com.example.agodaapp.R.color.agoda_red))
+                    binding.tvFlightStatus.background = android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#FFEBEE"))
+                }
+                else -> {
+                    binding.tvFlightStatus.setTextColor(binding.root.context.getColor(com.example.agodaapp.R.color.agoda_green))
+                    binding.tvFlightStatus.background = android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#E8F5E9"))
+                }
+            }
 
             binding.root.setOnClickListener { onItemClick(booking) }
         }

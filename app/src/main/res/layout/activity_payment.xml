@@ -4,323 +4,113 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F8F9FA">
+    android:background="@color/white">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#BA99EA"
+        android:background="@color/white"
+        app:title="Payment Details"
+        app:titleTextColor="@color/agoda_blue"
         app:navigationIcon="@drawable/ic_back"
-        app:title="Payment"
-        app:titleTextColor="@android:color/white" />
+        app:navigationIconTint="@color/agoda_blue" />
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Card Number"
+            android:layout_marginBottom="4dp"
+            android:textColor="@color/agoda_blue"
+            android:textStyle="bold"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilCardNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.Agoda.TextInputLayout">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etCardNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="19"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="horizontal">
 
-            <!-- Amount Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                android:layout_marginBottom="16dp">
-
-                <LinearLayout
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Expiration"
+                    android:layout_marginBottom="4dp"
+                    android:textColor="@color/agoda_blue"
+                    android:textStyle="bold"/>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilExpiry"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    style="@style/Widget.Agoda.TextInputLayout">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etExpiry"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Total Amount"
-                        android:textSize="14sp"
-                        android:textColor="#757575" />
+                        android:inputType="number"
+                        android:maxLength="5"/>
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tvAmount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="₱0.00"
-                        android:textSize="32sp"
-                        android:textStyle="bold"
-                        android:textColor="#6200EE"
-                        android:layout_marginTop="8dp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Payment Methods -->
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Select Payment Method"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <RadioGroup
-                android:id="@+id/paymentMethodGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <!-- Credit Card -->
-                <com.google.android.material.card.MaterialCardView
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CVV"
+                    android:layout_marginBottom="4dp"
+                    android:textColor="@color/agoda_blue"
+                    android:textStyle="bold"/>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilCvv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    android:layout_marginBottom="12dp">
-
-                    <RadioButton
-                        android:id="@+id/rbCreditCard"
+                    style="@style/Widget.Agoda.TextInputLayout">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etCvv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="  💳 Credit Card"
-                        android:padding="16dp"
-                        android:buttonTint="#6200EE" />
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Debit Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    android:layout_marginBottom="12dp">
-
-                    <RadioButton
-                        android:id="@+id/rbDebitCard"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="  💳 Debit Card"
-                        android:padding="16dp"
-                        android:buttonTint="#6200EE" />
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- GCash -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    android:layout_marginBottom="12dp">
-
-                    <RadioButton
-                        android:id="@+id/rbGCash"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="  📱 GCash"
-                        android:padding="16dp"
-                        android:buttonTint="#6200EE" />
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- PayMaya -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp"
-                    android:layout_marginBottom="12dp">
-
-                    <RadioButton
-                        android:id="@+id/rbPayMaya"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="  📱 PayMaya"
-                        android:padding="16dp"
-                        android:buttonTint="#6200EE" />
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Bank Transfer -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="2dp">
-
-                    <RadioButton
-                        android:id="@+id/rbBankTransfer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="  🏦 Bank Transfer"
-                        android:padding="16dp"
-                        android:buttonTint="#6200EE" />
-
-                </com.google.android.material.card.MaterialCardView>
-
-            </RadioGroup>
-
-            <!-- Card Details Form (shown when Credit/Debit Card selected) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardDetailsCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                android:layout_marginTop="16dp"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Card Details"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp" />
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Card Number"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_marginBottom="12dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etCardNumber"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="number" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Card Holder Name"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_marginBottom="12dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etCardHolder"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:hint="Expiry (MM/YY)"
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                            android:layout_marginEnd="8dp">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etExpiry"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:hint="MM/YY" />
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:hint="CVV"
-                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                            android:layout_marginStart="8dp">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etCVV"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="numberPassword" />
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:id="@+id/cbSaveCard"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Save this card for future payments"
-                        android:layout_marginTop="12dp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Mobile Payment Details (shown for GCash/PayMaya) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/mobilePaymentCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                android:layout_marginTop="16dp"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/tvMobileInstruction"
-                        android:text="Enter your GCash number"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="12dp" />
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Mobile Number"
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etMobileNumber"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="phone" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Pay Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnPay"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="24dp"
-                android:backgroundTint="#BA99EA"
-                android:text="Pay Now"
-                android:textAllCaps="false"
-                android:textSize="16sp"
-                app:cornerRadius="28dp" />
-
+                        android:inputType="numberPassword"
+                        android:maxLength="3"/>
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
         </LinearLayout>
 
-    </ScrollView>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPay"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:text="Pay Now"
+            style="@style/Widget.Agoda.Button"/>
 
+    </LinearLayout>
 </LinearLayout>

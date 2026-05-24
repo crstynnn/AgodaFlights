@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="?android:attr/windowBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,28 +17,29 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:layout_marginBottom="24dp">
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp">
 
             <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/ic_check_circle" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Booking Confirmed!"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
-                android:textColor="#4CAF50"
+                android:textColor="@color/agoda_green"
                 android:layout_marginTop="8dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Your flight has been booked successfully"
-                android:textSize="14sp"
-                android:textColor="#757575" />
+                android:textSize="13sp"
+                android:textColor="@color/gray_600" />
 
         </LinearLayout>
 
@@ -60,7 +61,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#6200EE"
+                    android:background="?attr/colorPrimary"
                     android:padding="16dp"
                     android:orientation="horizontal">
 
@@ -69,7 +70,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="AGODA FLIGHTS"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/white"
                         android:textStyle="bold" />
 
                     <TextView
@@ -77,7 +78,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="CONFIRMED"
-                        android:textColor="#4CAF50"
+                        android:textColor="@color/agoda_green"
                         android:background="#E8F5E9"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="4dp" />
@@ -88,7 +89,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#F5F5F5"
+                    android:background="@color/gray_100"
                     android:padding="12dp"
                     android:orientation="horizontal">
 
@@ -105,7 +106,7 @@
                         android:layout_height="wrap_content"
                         android:text="ABC123"
                         android:textStyle="bold"
-                        android:textColor="#6200EE" />
+                        android:textColor="?attr/colorPrimary" />
 
                 </LinearLayout>
 
@@ -123,7 +124,7 @@
                         android:text="MNL → CEB"
                         android:textSize="22sp"
                         android:textStyle="bold"
-                        android:textColor="#6200EE" />
+                        android:textColor="?attr/colorPrimary" />
 
                     <TextView
                         android:id="@+id/tvFlightName"
@@ -157,14 +158,14 @@
                             android:text="08:00"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="#6200EE" />
+                            android:textColor="?attr/colorPrimary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Departure"
                             android:textSize="11sp"
-                            android:textColor="#757575" />
+                            android:textColor="@color/gray_600" />
 
                     </LinearLayout>
 
@@ -179,7 +180,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/ic_arrow_forward"
-                            app:tint="#6200EE" />
+                            app:tint="?attr/colorPrimary" />
 
                     </LinearLayout>
 
@@ -197,14 +198,14 @@
                             android:text="09:25"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="#6200EE" />
+                            android:textColor="?attr/colorPrimary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Arrival"
                             android:textSize="11sp"
-                            android:textColor="#757575" />
+                            android:textColor="@color/gray_600" />
 
                     </LinearLayout>
 
@@ -215,7 +216,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:background="#FAFAFA"
+                    android:background="?android:attr/windowBackground"
                     android:orientation="vertical">
 
                     <TextView
@@ -316,7 +317,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:background="#FAFAFA"
+                    android:background="?android:attr/windowBackground"
                     android:orientation="vertical">
 
                     <TextView
@@ -368,7 +369,7 @@
                             android:text="₱4,620"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="#6200EE" />
+                            android:textColor="?attr/colorPrimary" />
 
                     </LinearLayout>
 

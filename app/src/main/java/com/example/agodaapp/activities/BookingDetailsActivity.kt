@@ -3,6 +3,7 @@ package com.example.agodaapp.activities
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.agodaapp.databinding.ActivityBookingDetailsBinding
 import com.example.agodaapp.models.Booking
@@ -10,14 +11,15 @@ import com.example.agodaapp.models.Flight
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 
 class BookingDetailsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityBookingDetailsBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
 
-    // Variables to receive data from FlightListActivity
     private var flightId = ""
     private var flightAirline = ""
     private var flightNumber = ""
@@ -32,8 +34,33 @@ class BookingDetailsActivity : AppCompatActivity() {
     private var flightTerminal = ""
     private var flightBaggage = ""
     private var passengerCount = 1
+    private var availableSeats = 0
     private var fromAirport = ""
     private var toAirport = ""
+    
+    private var selectedSeat: String? = null
+
+    private val paymentLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            confirmBooking()
+        }
+    }
+
+    private val seatSelectionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val seats = result.data?.getStringArrayListExtra("selected_seats")
+            val total = result.data?.getDoubleExtra("total_price", flightPrice) ?: flightPrice
+            if (!seats.isNullOrEmpty()) {
+                selectedSeat = seats.joinToString(", ")
+                passengerCount = seats.size
+                
+                binding.tvSelectedSeat.text = "Seats: $selectedSeat"
+                binding.tvPassengerCount.text = passengerCount.toString()
+                // Update total price display
+                binding.tvTotalPrice.text = String.format("₱%.2f", total + 250.0) // 250 is taxes
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +70,6 @@ class BookingDetailsActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
 
-        // RECEIVE DATA FROM FLIGHTLISTACTIVITY
         flightId = intent.getStringExtra("flight_id") ?: ""
         flightAirline = intent.getStringExtra("flight_airline") ?: ""
         flightNumber = intent.getStringExtra("flight_number") ?: ""
@@ -57,26 +83,37 @@ class BookingDetailsActivity : AppCompatActivity() {
         flightGate = intent.getStringExtra("flight_gate") ?: "A12"
         flightTerminal = intent.getStringExtra("flight_terminal") ?: "T1"
         flightBaggage = intent.getStringExtra("flight_baggage") ?: "20kg"
-        passengerCount = intent.getIntExtra("passenger_count", 1)
+        availableSeats = intent.getIntExtra("flight_available_seats", 50)
         fromAirport = intent.getStringExtra("from_airport") ?: ""
         toAirport = intent.getStringExtra("to_airport") ?: ""
 
-        // Setup toolbar
-        binding.toolbar.setNavigationOnClickListener {
-            finish()
-        }
+        binding.toolbar.setNavigationOnClickListener { finish() }
 
-        // Display flight details
+        // Setup UI
         displayFlightDetails()
-
-        // Load user data
         loadUserData()
 
-        // Confirm button click
+        // Seat selection
+        binding.btnSelectSeat.setOnClickListener {
+            val intent = Intent(this, SeatSelectionActivity::class.java).apply {
+                putExtra("flight_id", flightId)
+                putExtra("flight_price", flightPrice)
+                putExtra("passenger_count", passengerCount)
+                putExtra("available_seats", availableSeats)
+            }
+            seatSelectionLauncher.launch(intent)
+        }
+
         binding.btnConfirmBooking.setOnClickListener {
-            confirmBooking()
+            if (selectedSeat == null) {
+                Toast.makeText(this, "Please select seat(s) first", Toast.LENGTH_SHORT).show()
+            } else {
+                val intent = Intent(this, PaymentActivity::class.java)
+                paymentLauncher.launch(intent)
+            }
         }
     }
+
 
     private fun displayFlightDetails() {
         // Airline info
@@ -152,7 +189,7 @@ class BookingDetailsActivity : AppCompatActivity() {
             arrivalTime = flightArrival,
             duration = flightDuration,
             price = flightPrice,
-            availableSeats = 50,
+            availableSeats = availableSeats,
             date = flightDate,
             gate = flightGate,
             terminal = flightTerminal,
@@ -170,6 +207,7 @@ class BookingDetailsActivity : AppCompatActivity() {
             passengerEmail = passengerEmail,
             passengerPhone = passengerPhone,
             seats = passengerCount,
+            seatNumbers = selectedSeat?.split(", ")?.map { it.trim() } ?: emptyList(),
             totalPrice = totalPrice,
             bookingDate = bookingDate,
             status = "Confirmed",
@@ -196,9 +234,9 @@ class BookingDetailsActivity : AppCompatActivity() {
                     putExtra("flight_number", flightNumber)
                     putExtra("flight_from", fromAirport)
                     putExtra("flight_to", toAirport)
-                    putExtra("flight_date", flightDate)
-                    putExtra("departure_time", flightDeparture)
-                    putExtra("arrival_time", flightArrival)
+                    putExtra("flight_date", flight.getFormattedDate())
+                    putExtra("departure_time", flight.getFormattedDepartureTime())
+                    putExtra("arrival_time", flight.getFormattedArrivalTime())
                     putExtra("passenger_name", passengerName)
                     putExtra("passenger_count", passengerCount)
                     putExtra("gate", flightGate)

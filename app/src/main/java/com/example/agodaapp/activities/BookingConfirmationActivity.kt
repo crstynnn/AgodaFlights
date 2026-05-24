@@ -22,13 +22,26 @@ class BookingConfirmationActivity : AppCompatActivity() {
         val flightNumber = intent.getStringExtra("flight_number") ?: ""
         val flightFrom = intent.getStringExtra("flight_from") ?: ""
         val flightTo = intent.getStringExtra("flight_to") ?: ""
+        val flightDate = intent.getStringExtra("flight_date") ?: ""
+        val departureTime = intent.getStringExtra("departure_time") ?: ""
+        val arrivalTime = intent.getStringExtra("arrival_time") ?: ""
+        val passengerName = intent.getStringExtra("passenger_name") ?: "Traveler"
+        val gate = intent.getStringExtra("gate") ?: "A12"
+        val terminal = intent.getStringExtra("terminal") ?: "T1"
 
         binding.tvBookingReference.text = bookingRef
-        binding.tvFlightRoute.text = "${flightFrom.split(" ")[0]} → ${flightTo.split(" ")[0]}"
+        binding.tvFlightRoute.text = "${flightFrom.split(" ").firstOrNull() ?: ""} → ${flightTo.split(" ").firstOrNull() ?: ""}"
         binding.tvFlightName.text = "$flightAirline • $flightNumber"
         binding.tvTotalAmount.text = String.format("₱%,.2f", totalAmount)
         binding.tvPaymentMethod.text = paymentMethod
         binding.tvTicketStatus.text = "CONFIRMED"
+        
+        binding.tvDepartureTime.text = departureTime
+        binding.tvArrivalTime.text = arrivalTime
+        binding.tvFlightDate.text = flightDate
+        binding.tvPassengerName.text = passengerName
+        binding.tvGate.text = gate
+        binding.tvTerminal.text = terminal
 
         binding.btnViewBookings.setOnClickListener {
             startActivity(Intent(this, MyBookingsActivity::class.java))
@@ -36,7 +49,6 @@ class BookingConfirmationActivity : AppCompatActivity() {
         }
 
         binding.btnBackToHome.setOnClickListener {
-            // Clear the back stack so user goes fresh to home
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
@@ -53,8 +65,9 @@ class BookingConfirmationActivity : AppCompatActivity() {
                 append("Booking Ref: $bookingRef\n")
                 append("Flight: $flightAirline $flightNumber\n")
                 append("Route: ${flightFrom.split(" ")[0]} → ${flightTo.split(" ")[0]}\n")
+                append("Date: $flightDate\n")
+                append("Passenger: $passengerName\n")
                 append("Total: ${String.format("₱%,.2f", totalAmount)}\n")
-                append("Payment: $paymentMethod\n")
                 append("Status: CONFIRMED ✅")
             }
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -65,7 +78,6 @@ class BookingConfirmationActivity : AppCompatActivity() {
         }
     }
 
-    // Prevent going back after booking is confirmed
     override fun onBackPressed() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK

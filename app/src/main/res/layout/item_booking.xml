@@ -40,20 +40,34 @@
                     android:layout_height="wrap_content"
                     android:text="MNL → CEB"
                     android:textSize="13sp"
-                    android:textColor="#757575" />
+                    android:textColor="@color/gray_600" />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tvStatus"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Confirmed"
-                android:textSize="12sp"
-                android:textColor="#4CAF50"
-                android:background="#E8F5E9"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvFlightStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:id="@+id/tvBookingStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -64,7 +78,7 @@
             android:layout_height="wrap_content"
             android:text="Dec 25, 2024"
             android:textSize="13sp"
-            android:textColor="#757575"
+            android:textColor="@color/gray_600"
             android:layout_marginTop="8dp" />
 
         <!-- Passenger -->
@@ -74,7 +88,7 @@
             android:layout_height="wrap_content"
             android:text="Passenger: John Doe"
             android:textSize="13sp"
-            android:textColor="#757575"
+            android:textColor="@color/gray_600"
             android:layout_marginTop="4dp" />
 
         <!-- Seats -->
@@ -84,7 +98,7 @@
             android:layout_height="wrap_content"
             android:text="Seats: 2"
             android:textSize="13sp"
-            android:textColor="#757575"
+            android:textColor="@color/gray_600"
             android:layout_marginTop="4dp" />
 
         <!-- Price -->
@@ -95,7 +109,7 @@
             android:text="₱5,000"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#6200EE"
+            android:textColor="?attr/colorPrimary"
             android:layout_marginTop="8dp" />
 
     </LinearLayout>

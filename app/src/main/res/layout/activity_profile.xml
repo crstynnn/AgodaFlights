@@ -9,10 +9,10 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#6200EE"
+        android:background="@color/white"
         app:title="Profile"
-        app:titleTextColor="@android:color/white"
-        app:navigationIcon="@drawable/ic_back"/>
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="@color/agoda_blue"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -26,12 +26,12 @@
             android:gravity="center_horizontal">
 
             <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:src="@drawable/ic_profile"
-                android:tint="#6200EE"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"/>
+                android:tint="?attr/colorPrimary"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"/>
 
             <TextView
                 android:id="@+id/tvName"
@@ -46,8 +46,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="24dp"/>
+                android:textColor="@color/gray_600"
+                android:layout_marginBottom="16dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit Profile"
+                android:textAllCaps="false"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_marginBottom="16dp"/>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -90,7 +99,7 @@
                             android:text="0"
                             android:textSize="14sp"
                             android:textStyle="bold"
-                            android:textColor="#6200EE"/>
+                            android:textColor="?attr/colorPrimary"/>
                     </LinearLayout>
 
                     <LinearLayout
@@ -112,7 +121,7 @@
                             android:text="₱0"
                             android:textSize="14sp"
                             android:textStyle="bold"
-                            android:textColor="#6200EE"/>
+                            android:textColor="?attr/colorPrimary"/>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -150,7 +159,7 @@
                         android:layout_height="wrap_content"
                         android:text="Version 1.0.0"
                         android:textSize="12sp"
-                        android:textColor="@android:color/darker_gray"/>
+                        android:textColor="@color/gray_600"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -160,9 +169,9 @@
                 android:layout_height="56dp"
                 android:text="Logout"
                 android:textAllCaps="false"
-                android:textColor="#D32F2F"
+                android:textColor="@color/agoda_red"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:strokeColor="#D32F2F"/>
+                android:strokeColor="@color/agoda_red"/>
 
         </LinearLayout>
     </ScrollView>

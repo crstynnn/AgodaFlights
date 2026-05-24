@@ -3,23 +3,25 @@ package com.example.agodaapp.activities
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.transition.TransitionManager
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.agodaapp.R
-import com.example.agodaapp.adapters.BookingAdapter
+import com.example.agodaapp.adapters.FlightAdapter
 import com.example.agodaapp.databinding.ActivityMainBinding
-import com.example.agodaapp.models.Booking
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
-    private lateinit var bookingAdapter: BookingAdapter
+    private lateinit var flightAdapter: FlightAdapter
 
     private val philippineAirports = arrayOf(
         "MNL - Ninoy Aquino Int'l Airport, Manila",
@@ -47,13 +49,15 @@ class MainActivity : AppCompatActivity() {
         setupAirportSpinners()
         setupDatePicker()
         loadUserData()
-        setupRecentBookings()
-        loadRecentBookings()
+        setupAvailableFlights()
+        loadAvailableFlights()
+        setupSearchExpansion()
 
         binding.btnSearchFlights.setOnClickListener {
             searchFlights()
         }
 
+        binding.bottomNavigation.selectedItemId = R.id.navigation_home
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> true
@@ -70,12 +74,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupSearchExpansion() {
+        binding.btnExpandSearch.setOnClickListener {
+            val isExpanding = binding.llSearchInputs.visibility == View.GONE
+            
+            TransitionManager.beginDelayedTransition(binding.cvSearch)
+            
+            if (isExpanding) {
+                binding.llSearchInputs.visibility = View.VISIBLE
+                binding.btnExpandSearch.text = "Close Search"
+                binding.btnExpandSearch.setIconResource(R.drawable.ic_back) // Using ic_back as a close/up icon
+            } else {
+                binding.llSearchInputs.visibility = View.GONE
+                binding.btnExpandSearch.text = "Search Flights"
+                binding.btnExpandSearch.setIconResource(R.drawable.ic_search)
+            }
+        }
+    }
+
     private fun setupAirportSpinners() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, philippineAirports)
         binding.actFrom.setAdapter(adapter)
         binding.actTo.setAdapter(adapter)
-        binding.actFrom.setText(philippineAirports[0], false)
-        binding.actTo.setText(philippineAirports[1], false)
     }
 
     private fun setupDatePicker() {
@@ -107,42 +127,109 @@ class MainActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { document ->
                 val name = document.getString("name") ?: "User"
-                binding.tvUserName.text = name.split(" ")[0]
+                binding.toolbar.subtitle = "Hello, ${name.split(" ")[0]}"
             }
     }
 
-    private fun setupRecentBookings() {
-        bookingAdapter = BookingAdapter(mutableListOf()) { booking ->
-            // Navigate to booking confirmation details on click
-            val intent = Intent(this, BookingConfirmationActivity::class.java).apply {
-                putExtra("booking_ref", booking.bookingReference)
-                putExtra("total_amount", booking.totalPrice)
-                putExtra("payment_method", booking.paymentMethod)
-                putExtra("flight_airline", booking.flight?.airline ?: "")
-                putExtra("flight_number", booking.flight?.flightNumber ?: "")
-                putExtra("flight_from", booking.flight?.from ?: "")
-                putExtra("flight_to", booking.flight?.to ?: "")
+    private fun setupAvailableFlights() {
+        flightAdapter = FlightAdapter(mutableListOf(), emptyMap(), { flight ->
+            // ... (rest of intent setup)
+            val intent = Intent(this, BookingDetailsActivity::class.java).apply {
+                putExtra("flight_id", flight.id)
+                putExtra("flight_airline", flight.airline)
+                putExtra("flight_number", flight.flightNumber)
+                putExtra("flight_price", flight.price)
+                putExtra("flight_departure", flight.getFormattedDepartureTime())
+                putExtra("flight_arrival", flight.getFormattedArrivalTime())
+                putExtra("flight_duration", flight.duration)
+                putExtra("flight_from", flight.from)
+                putExtra("flight_to", flight.to)
+                putExtra("flight_date", flight.getFormattedDate())
+                putExtra("flight_gate", flight.gate)
+                putExtra("flight_terminal", flight.terminal)
+                putExtra("flight_baggage", flight.baggageAllowance)
+                putExtra("flight_available_seats", flight.availableSeats)
+                putExtra("passenger_count", 1) // Default for quick booking from home
             }
             startActivity(intent)
-        }
-        binding.rvRecentBookings.layoutManager = LinearLayoutManager(this)
-        binding.rvRecentBookings.adapter = bookingAdapter
+        })
+        binding.rvAvailableFlights.layoutManager = LinearLayoutManager(this)
+        binding.rvAvailableFlights.adapter = flightAdapter
     }
 
-    private fun loadRecentBookings() {
-        val userId = auth.currentUser?.uid ?: return
-        firestore.collection("bookings")
-            .whereEqualTo("userId", userId)
-            .orderBy("bookingDate", com.google.firebase.firestore.Query.Direction.DESCENDING)
-            .limit(3)
+    private fun loadAvailableFlights() {
+        val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        
+        // Listen for bookings to get accurate counts
+        firestore.collection("bookings").addSnapshotListener { bookingsSnapshot, _ ->
+            val bookedSeatsPerFlight = mutableMapOf<String, Int>()
+            bookingsSnapshot?.forEach { doc ->
+                val fId = doc.getString("flightId") ?: ""
+                if (fId.isNotEmpty()) {
+                    val seatsList = doc.get("seatNumbers") as? List<*>
+                    val count = seatsList?.size ?: doc.getLong("seats")?.toInt() ?: 0
+                    bookedSeatsPerFlight[fId] = bookedSeatsPerFlight.getOrDefault(fId, 0) + count
+                }
+            }
+
+            // Load flights
+            firestore.collection("flights")
+                .whereGreaterThanOrEqualTo("date", todayStr)
+                .orderBy("date")
+                .limit(20)
+                .get()
+                .addOnSuccessListener { result ->
+                    val flights = result.documents.mapNotNull { doc ->
+                        val f = doc.toObject(com.example.agodaapp.models.Flight::class.java)
+                        f?.copy(id = if (f.id.isEmpty()) doc.id else f.id)
+                    }
+                    flightAdapter.updateData(flights, bookedSeatsPerFlight)
+                    updateAirportSuggestions(flights)
+                }
+                .addOnFailureListener { e ->
+                    android.util.Log.e("MainActivity", "Error loading flights: ${e.message}")
+                    loadAvailableFlightsBasic(bookedSeatsPerFlight)
+                }
+        }
+    }
+
+    private fun loadAvailableFlightsBasic(bookedSeatsPerFlight: Map<String, Int> = emptyMap()) {
+        firestore.collection("flights")
+            .limit(20)
             .get()
             .addOnSuccessListener { result ->
-                val bookings = result.toObjects(Booking::class.java)
-                bookingAdapter.updateBookings(bookings)
+                val flights = result.documents.mapNotNull { doc ->
+                    val f = doc.toObject(com.example.agodaapp.models.Flight::class.java)
+                    f?.copy(id = if (f.id.isEmpty()) doc.id else f.id)
+                }
+                val now = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.time
+                val filteredFlights = flights.filter { 
+                    val flightDate = it.getDepartureDateObject()
+                    flightDate != null && (flightDate.after(now) || flightDate.equals(now))
+                }
+                flightAdapter.updateData(filteredFlights, bookedSeatsPerFlight)
+                updateAirportSuggestions(filteredFlights)
             }
-            .addOnFailureListener {
-                // Silently fail — recent bookings are non-critical
-            }
+    }
+
+    private fun updateAirportSuggestions(flights: List<com.example.agodaapp.models.Flight>) {
+        val airports = mutableSetOf<String>()
+        flights.forEach {
+            airports.add(it.from)
+            airports.add(it.to)
+        }
+        
+        // Combine with default airports
+        airports.addAll(philippineAirports)
+        
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, airports.toList().sorted())
+        binding.actFrom.setAdapter(adapter)
+        binding.actTo.setAdapter(adapter)
     }
 
     private fun searchFlights() {

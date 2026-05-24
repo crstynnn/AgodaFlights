@@ -2,8 +2,8 @@ package com.example.agodaapp.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
 import com.example.agodaapp.databinding.ActivityPaymentSuccessBinding
 
 class PaymentSuccessActivity : AppCompatActivity() {
@@ -31,7 +31,7 @@ class PaymentSuccessActivity : AppCompatActivity() {
         }
 
         binding.btnDownloadReceipt.setOnClickListener {
-            Toast.makeText(this, "Receipt saved to Downloads", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Receipt saved to Downloads", Toast.LENGTH_SHORT).show()
         }
 
         binding.btnBackToHome.setOnClickListener {
